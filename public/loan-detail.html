@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>รายละเอียดสัญญา - ระบบกู้ยืมเงินรายย่อย</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><span>💰 MicroLoan</span><small>ระบบกู้ยืมเงินรายย่อย</small></div>
+    <nav class="sidebar-nav">
+      <a href="/index.html" class="nav-item"><span class="icon">📊</span><span>แดชบอร์ด</span></a>
+      <a href="/customers.html" class="nav-item"><span class="icon">👥</span><span>ลูกหนี้</span></a>
+      <a href="/loans.html" class="nav-item"><span class="icon">📋</span><span>สัญญากู้ยืม</span></a>
+      <a href="/payments.html" class="nav-item"><span class="icon">💳</span><span>การชำระเงิน</span></a>
+    </nav>
+    <div class="sidebar-bottom">แอดมิน: <span id="admin-name">-</span></div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <a href="/loans.html" class="btn btn-outline btn-sm">← กลับ</a>
+        <div class="topbar-title" id="page-title">รายละเอียดสัญญา</div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button id="btn-contract" class="btn btn-primary" onclick="openContract()">🖨️ สัญญา PDF</button>
+        <button id="logout-btn" class="btn btn-outline btn-sm">ออกจากระบบ</button>
+      </div>
+    </header>
+
+    <div class="content">
+      <!-- Loan Summary -->
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px">
+        <div>
+          <div class="card">
+            <div class="card-title">📋 ข้อมูลสัญญา <span id="loan-status"></span></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:14px" id="loan-info"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">👤 ข้อมูลลูกหนี้</div>
+            <div id="customer-info" style="font-size:14px"></div>
+          </div>
+
+          <div class="card" id="guarantor-card" style="display:none">
+            <div class="card-title">🤝 ผู้ค้ำประกัน</div>
+            <div id="guarantor-info" style="font-size:14px"></div>
+          </div>
+        </div>
+
+        <div>
+          <!-- Progress -->
+          <div class="card">
+            <div class="card-title">💰 ความคืบหน้า</div>
+            <div id="progress-section"></div>
+          </div>
+
+          <!-- Actions -->
+          <div class="card">
+            <div class="card-title">⚙️ จัดการสัญญา</div>
+            <div id="actions-section" style="display:flex;flex-direction:column;gap:8px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Schedule -->
+      <div class="card">
+        <div class="card-title">📅 ตารางผ่อนชำระ (ลดต้นลดดอก)</div>
+        <div class="table-wrap">
+          <table id="schedule-table">
+            <thead>
+              <tr>
+                <th>งวดที่</th>
+                <th>วันครบกำหนด</th>
+                <th>ค่างวด (บ.)</th>
+                <th>เงินต้น (บ.)</th>
+                <th>ดอกเบี้ย (บ.)</th>
+                <th>ยอดคงเหลือ (บ.)</th>
+                <th>สถานะ</th>
+              </tr>
+            </thead>
+            <tbody id="schedule-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Payment History -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div class="card-title" style="margin:0">💳 ประวัติการชำระ</div>
+          <button class="btn btn-primary btn-sm" onclick="openPaymentModal()">+ บันทึกชำระ</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>วันที่ชำระ</th><th>ยอดชำระ</th><th>ค่าปรับ</th><th>วิธี</th><th>สลิป</th><th>สถานะ</th><th>จัดการ</th></tr></thead>
+            <tbody id="payment-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal-bg" id="pay-modal">
+  <div class="modal">
+    <div class="modal-title">💳 บันทึกการชำระเงิน</div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label>ยอดชำระ (บาท) <span style="color:#dc2626">*</span></label>
+      <input type="number" id="p-amount" placeholder="0.00" min="1">
+      <small style="color:#6b7280;margin-top:4px">ค่างวดปกติ: <span id="p-pmt-hint">-</span> บาท</small>
+    </div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label>วิธีการชำระ</label>
+      <select id="p-method">
+        <option value="โอน">โอนเงิน</option>
+        <option value="เงินสด">เงินสด</option>
+        <option value="QR Code">QR Code</option>
+        <option value="อื่นๆ">อื่นๆ</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label>แนบสลิปการโอน</label>
+      <input type="file" id="p-slip" accept="image/*">
+      <img id="slip-preview-img" class="slip-preview" style="display:none">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closePayModal()">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="submitPayment()">💾 บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- Slip View Modal -->
+<div class="modal-bg" id="slip-modal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-title">🧾 สลิปการโอน</div>
+    <img id="slip-view-img" style="width:100%;border-radius:8px" src="">
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="document.getElementById('slip-modal').classList.remove('open')">ปิด</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="/js/app.js"></script>
+<script>
+const loanId = new URLSearchParams(window.location.search).get('id');
+let loanData = null;
+
+async function loadDetail() {
+  try {
+    loanData = await api('GET', `/api/loans/${loanId}`);
+    const { loan, guarantors, payments, schedule } = loanData;
+
+    document.getElementById('page-title').textContent = `สัญญา #${loan.id}`;
+    document.getElementById('loan-status').innerHTML = statusBadge(loan.loanStatus);
+
+    const pmt = schedule.length > 0 ? schedule[0].payment : 0;
+    const totalPaid = parseFloat(loan.totalPaid);
+    const remaining = Math.max(0, parseFloat(loan.amount) - totalPaid);
+    const progressPct = Math.min(100, (totalPaid / parseFloat(loan.amount)) * 100);
+
+    document.getElementById('loan-info').innerHTML = `
+      <div><div style="color:#6b7280">วงเงินกู้</div><div style="font-size:18px;font-weight:700">${formatMoney(loan.amount)} บาท</div></div>
+      <div><div style="color:#6b7280">ดอกเบี้ย</div><div style="font-size:18px;font-weight:700">${loan.rate}% / ปี</div></div>
+      <div><div style="color:#6b7280">จำนวนงวด</div><div style="font-weight:600">${loan.month} เดือน</div></div>
+      <div><div style="color:#6b7280">ค่างวด/เดือน</div><div style="font-weight:600">${formatMoney(pmt)} บาท</div></div>
+      <div><div style="color:#6b7280">วันที่กู้</div><div>${formatDate(loan.date)}</div></div>
+      <div><div style="color:#6b7280">ครบกำหนด</div><div style="color:${new Date(loan.dueDate)<new Date()&&loan.loanStatus==='active'?'#dc2626':'inherit'}">${formatDate(loan.dueDate)}</div></div>
+      <div style="grid-column:1/-1"><div style="color:#6b7280">วัตถุประสงค์</div><div>${loan.purpose || '-'}</div></div>`;
+
+    document.getElementById('customer-info').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div><span style="color:#6b7280">ชื่อ-นามสกุล</span><br><strong>${loan.firstName} ${loan.lastName}</strong></div>
+        <div><span style="color:#6b7280">เบอร์โทร</span><br>${loan.phone || '-'}</div>
+        <div><span style="color:#6b7280">เลขบัตรประชาชน</span><br>${loan.citizenNumber || '-'}</div>
+        <div><span style="color:#6b7280">อาชีพ</span><br>${loan.occupation || '-'}</div>
+        <div><span style="color:#6b7280">รายได้/เดือน</span><br>${loan.monthlyIncome ? formatMoney(loan.monthlyIncome) + ' บาท' : '-'}</div>
+        <div style="grid-column:1/-1"><span style="color:#6b7280">ที่อยู่</span><br>${loan.address || '-'}</div>
+      </div>`;
+
+    if (guarantors.length > 0) {
+      document.getElementById('guarantor-card').style.display = 'block';
+      document.getElementById('guarantor-info').innerHTML = guarantors.map(g => `
+        <div style="padding:8px;background:#f9fafb;border-radius:6px;margin-bottom:6px">
+          <strong>${g.name}</strong> (${g.relationship || '-'})<br>
+          เบอร์: ${g.phone || '-'} | บัตร: ${g.citizenNumber || '-'}
+        </div>`).join('');
+    }
+
+    document.getElementById('progress-section').innerHTML = `
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+          <span>ชำระแล้ว ${formatMoney(totalPaid)} บาท</span>
+          <span>${progressPct.toFixed(1)}%</span>
+        </div>
+        <div class="progress">
+          <div class="progress-bar ${remaining === 0 ? 'success' : ''}" style="width:${progressPct}%"></div>
+        </div>
+        <div style="margin-top:8px;font-size:13px;color:#6b7280">คงเหลือ: <strong style="color:${remaining>0?'#dc2626':'#16a34a'}">${formatMoney(remaining)} บาท</strong></div>
+      </div>`;
+
+    const actionsEl = document.getElementById('actions-section');
+    let actionsHTML = '';
+    if (loan.loanStatus === 'pending') {
+      actionsHTML += `<button class="btn btn-success" onclick="setStatus('active')">✅ อนุมัติสัญญา</button>
+        <button class="btn btn-danger" onclick="setStatus('rejected')">❌ ปฏิเสธสัญญา</button>`;
+    }
+    if (loan.loanStatus === 'active') {
+      actionsHTML += `<button class="btn btn-primary" onclick="openPaymentModal()">💳 บันทึกชำระ</button>
+        <button class="btn btn-warning" onclick="setStatus('closed')">🔒 ปิดสัญญา</button>`;
+    }
+    if (loan.loanStatus === 'closed') {
+      actionsHTML = `<div class="alert alert-success">✅ สัญญานี้ปิดแล้ว</div>`;
+    }
+    actionsEl.innerHTML = actionsHTML;
+    document.getElementById('p-pmt-hint').textContent = formatMoney(pmt);
+
+    renderSchedule(schedule, payments);
+    renderPayments(payments, loan.loanStatus);
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+function renderSchedule(schedule, payments) {
+  const approvedPay = payments.filter(p => p.stats === 'อนุมัติ').reduce((s, p) => s + parseFloat(p.payAmount), 0);
+  let cumPaid = approvedPay;
+  const tbody = document.getElementById('schedule-body');
+  tbody.innerHTML = schedule.map(s => {
+    const installmentAmount = s.payment;
+    let rowStatus = '';
+    let rowStyle = '';
+    const due = new Date(s.dueDate);
+    const today = new Date();
+
+    if (cumPaid >= installmentAmount) {
+      rowStatus = '<span class="badge badge-approved">ชำระแล้ว</span>';
+      rowStyle = 'background:#f0fdf4';
+      cumPaid -= installmentAmount;
+    } else if (due < today) {
+      rowStatus = '<span class="badge badge-rejected">เกินกำหนด</span>';
+      rowStyle = 'background:#fff1f2';
+    } else if (due <= new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)) {
+      rowStatus = '<span class="badge badge-wait">ใกล้ครบกำหนด</span>';
+      rowStyle = 'background:#fffbeb';
+    } else {
+      rowStatus = '<span class="badge badge-pending">รอชำระ</span>';
+    }
+
+    return `<tr style="${rowStyle}">
+      <td style="text-align:center">${s.installment}</td>
+      <td>${s.dueDate}</td>
+      <td style="text-align:right">${formatMoney(s.payment)}</td>
+      <td style="text-align:right">${formatMoney(s.principal)}</td>
+      <td style="text-align:right">${formatMoney(s.interest)}</td>
+      <td style="text-align:right;font-weight:600">${formatMoney(s.balance)}</td>
+      <td>${rowStatus}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderPayments(payments, loanStatus) {
+  const tbody = document.getElementById('payment-body');
+  if (payments.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#6b7280;padding:20px">ยังไม่มีประวัติการชำระ</td></tr>';
+    return;
+  }
+  tbody.innerHTML = payments.map(p => `
+    <tr>
+      <td>${formatDate(p.payDate)}</td>
+      <td style="font-weight:600">${formatMoney(p.payAmount)} บาท</td>
+      <td>${p.lateFee > 0 ? formatMoney(p.lateFee) : '-'}</td>
+      <td>${p.method || '-'}</td>
+      <td>${p.cdnurl ? `<button class="btn btn-outline btn-sm" onclick="viewSlip('${p.cdnurl}')">🧾 ดูสลิป</button>` : '-'}</td>
+      <td>${statusBadge(p.stats)}</td>
+      <td>
+        ${p.stats === 'รอตรวจ' ? `
+          <button class="btn btn-success btn-sm" onclick="approvePayment(${p.id},'อนุมัติ')">✅</button>
+          <button class="btn btn-danger btn-sm" onclick="approvePayment(${p.id},'ปฏิเสธ')">❌</button>
+        ` : '-'}
+      </td>
+    </tr>`).join('');
+}
+
+function viewSlip(url) {
+  document.getElementById('slip-view-img').src = url;
+  document.getElementById('slip-modal').classList.add('open');
+}
+
+function openPaymentModal() { document.getElementById('pay-modal').classList.add('open'); }
+function closePayModal() { document.getElementById('pay-modal').classList.remove('open'); }
+
+document.getElementById('p-slip').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = document.getElementById('slip-preview-img');
+      img.src = ev.target.result;
+      img.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+async function submitPayment() {
+  const amount = document.getElementById('p-amount').value;
+  const method = document.getElementById('p-method').value;
+  const slip = document.getElementById('p-slip').files[0];
+  if (!amount) return toast('กรุณากรอกยอดชำระ', 'error');
+
+  const fd = new FormData();
+  fd.append('loan_id', loanId);
+  fd.append('payAmount', amount);
+  fd.append('method', method);
+  if (slip) fd.append('slip', slip);
+
+  try {
+    const res = await api('POST', '/api/payments', fd, true);
+    toast(res.message, 'success');
+    closePayModal();
+    document.getElementById('p-amount').value = '';
+    document.getElementById('p-slip').value = '';
+    document.getElementById('slip-preview-img').style.display = 'none';
+    loadDetail();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function approvePayment(id, action) {
+  if (!confirm(`ต้องการ${action}รายการชำระนี้?`)) return;
+  try {
+    const res = await api('PUT', `/api/payments/${id}/approve`, { action });
+    toast(res.message, 'success');
+    loadDetail();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function setStatus(status) {
+  try {
+    await api('PUT', `/api/loans/${loanId}/status`, { status });
+    toast('อัปเดตสถานะเรียบร้อย', 'success');
+    loadDetail();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+function openContract() {
+  window.open(`/api/loans/${loanId}/contract`, '_blank');
+}
+
+document.getElementById('pay-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closePayModal(); });
+document.getElementById('slip-modal').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('open'); });
+
+if (!loanId) { window.location.href = '/loans.html'; }
+else { checkAuth().then(admin => { if (admin) loadDetail(); }); }
+</script>
+</body>
+</html>

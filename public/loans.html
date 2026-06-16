@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>สัญญากู้ยืม - ระบบกู้ยืมเงินรายย่อย</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><span>💰 MicroLoan</span><small>ระบบกู้ยืมเงินรายย่อย</small></div>
+    <nav class="sidebar-nav">
+      <a href="/index.html" class="nav-item"><span class="icon">📊</span><span>แดชบอร์ด</span></a>
+      <a href="/customers.html" class="nav-item"><span class="icon">👥</span><span>ลูกหนี้</span></a>
+      <a href="/loans.html" class="nav-item"><span class="icon">📋</span><span>สัญญากู้ยืม</span></a>
+      <a href="/payments.html" class="nav-item"><span class="icon">💳</span><span>การชำระเงิน</span></a>
+    </nav>
+    <div class="sidebar-bottom">แอดมิน: <span id="admin-name">-</span></div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title">📋 สัญญากู้ยืมเงิน</div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-primary" onclick="openAddModal()">+ สร้างสัญญาใหม่</button>
+        <button id="logout-btn" class="btn btn-outline btn-sm">ออกจากระบบ</button>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="card">
+        <div class="search-bar">
+          <input type="text" id="search" placeholder="🔍 ค้นหาชื่อลูกหนี้..." oninput="filterTable()">
+          <select id="filter-status" onchange="filterTable()">
+            <option value="">ทุกสถานะ</option>
+            <option value="pending">รอดำเนินการ</option>
+            <option value="active">กำลังดำเนินการ</option>
+            <option value="closed">ปิดสัญญา</option>
+            <option value="rejected">ปฏิเสธ</option>
+          </select>
+          <span id="count-label" style="white-space:nowrap;color:#6b7280;font-size:14px"></span>
+        </div>
+        <div class="table-wrap">
+          <table id="loan-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>ลูกหนี้</th>
+                <th>วงเงิน</th>
+                <th>ดอกเบี้ย</th>
+                <th>งวด</th>
+                <th>ค่างวด/เดือน</th>
+                <th>ชำระแล้ว</th>
+                <th>คงเหลือ</th>
+                <th>ครบกำหนด</th>
+                <th>สถานะ</th>
+                <th>จัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="loan-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Loan Modal -->
+<div class="modal-bg" id="modal">
+  <div class="modal modal-lg">
+    <div class="modal-title">📋 สร้างสัญญากู้ยืมเงิน</div>
+
+    <div class="alert alert-info" style="margin-bottom:16px">
+      ℹ️ วงเงินสูงสุด 50,000 บาท | ดอกเบี้ยสูงสุด 15% ต่อปี (ตาม ป.พ.พ. มาตรา 654)
+    </div>
+
+    <!-- Step 1: Select customer -->
+    <div class="form-group" style="margin-bottom:16px">
+      <label>ลูกหนี้ <span style="color:#dc2626">*</span></label>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="customer-search" placeholder="ค้นหาชื่อลูกหนี้..." oninput="searchCustomer()" autocomplete="off" style="flex:1">
+        <button class="btn btn-outline btn-sm" onclick="clearCustomer()">ล้าง</button>
+      </div>
+      <div id="customer-dropdown" style="position:relative"></div>
+      <input type="hidden" id="f-customer-id">
+      <div id="selected-customer" style="margin-top:8px;padding:10px;background:#f0f9ff;border-radius:6px;display:none;font-size:14px"></div>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>วงเงินกู้ (บาท) <span style="color:#dc2626">*</span></label>
+        <input type="number" id="f-amount" placeholder="ไม่เกิน 50,000" min="100" max="50000" oninput="calcPreview()">
+      </div>
+      <div class="form-group">
+        <label>อัตราดอกเบี้ย (% ต่อปี)</label>
+        <input type="number" id="f-rate" value="15" min="0" max="15" step="0.01" oninput="calcPreview()">
+      </div>
+      <div class="form-group">
+        <label>จำนวนงวด (เดือน) <span style="color:#dc2626">*</span></label>
+        <input type="number" id="f-month" placeholder="6, 12, 24..." min="1" max="60" oninput="calcPreview()">
+      </div>
+      <div class="form-group">
+        <label>วิธีการชำระ</label>
+        <select id="f-method">
+          <option>รายเดือน</option>
+          <option>รายสัปดาห์</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>วัตถุประสงค์การกู้</label>
+        <input type="text" id="f-purpose" placeholder="เช่น ทุนการค้า, ค่าใช้จ่ายฉุกเฉิน...">
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <div id="calc-preview" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px;margin:12px 0;font-size:14px">
+      <strong>📊 สรุปการกู้ยืม</strong>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:10px">
+        <div><div style="color:#6b7280">ค่างวด/เดือน</div><div style="font-size:18px;font-weight:700;color:#16a34a" id="prev-pmt">-</div></div>
+        <div><div style="color:#6b7280">ดอกเบี้ยทั้งหมด</div><div style="font-size:18px;font-weight:700;color:#d97706" id="prev-interest">-</div></div>
+        <div><div style="color:#6b7280">ยอดชำระรวม</div><div style="font-size:18px;font-weight:700" id="prev-total">-</div></div>
+      </div>
+    </div>
+
+    <!-- Guarantor -->
+    <div style="margin-top:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <strong style="font-size:14px">ผู้ค้ำประกัน</strong>
+        <button class="btn btn-outline btn-sm" onclick="addGuarantor()">+ เพิ่มผู้ค้ำประกัน</button>
+      </div>
+      <div id="guarantors-list"></div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveLoan()">💾 สร้างสัญญา</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="/js/app.js"></script>
+<script>
+let loans = [];
+let allCustomers = [];
+let guarantorCount = 0;
+
+async function loadLoans() {
+  try {
+    loans = await api('GET', '/api/loans');
+    // Check if filtering by customer from URL
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('customer')) {
+      document.getElementById('search').value = '';
+    }
+    renderTable(loans);
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+function renderTable(data) {
+  const tbody = document.getElementById('loan-body');
+  document.getElementById('count-label').textContent = `ทั้งหมด ${data.length} สัญญา`;
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:#6b7280;padding:30px">ยังไม่มีสัญญากู้ยืม</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(l => {
+    const pmt = calcPMT(parseFloat(l.amount), parseFloat(l.rate), l.month);
+    const remaining = Math.max(0, parseFloat(l.amount) - parseFloat(l.totalPaid));
+    const overdue = l.loanStatus === 'active' && new Date(l.dueDate) < new Date();
+    return `<tr style="${overdue ? 'background:#fff1f2' : ''}">
+      <td style="color:#6b7280">${l.id}</td>
+      <td><strong>${l.firstName} ${l.lastName}</strong><br><small style="color:#6b7280">${l.phone || ''}</small></td>
+      <td style="font-weight:600">${formatMoney(l.amount)}</td>
+      <td>${l.rate}%</td>
+      <td style="text-align:center">${l.month} เดือน</td>
+      <td>${formatMoney(pmt)}</td>
+      <td style="color:#16a34a">${formatMoney(l.totalPaid)}</td>
+      <td style="font-weight:600;color:${remaining > 0 ? '#dc2626' : '#16a34a'}">${formatMoney(remaining)}</td>
+      <td style="color:${overdue ? '#dc2626' : 'inherit'};font-weight:${overdue ? '600' : 'normal'}">${formatDate(l.dueDate)}${overdue ? ' ⚠️' : ''}</td>
+      <td>${statusBadge(l.loanStatus)}</td>
+      <td>
+        <a href="/loan-detail.html?id=${l.id}" class="btn btn-outline btn-sm">🔍 ดู</a>
+        ${l.loanStatus === 'pending' ? `<button class="btn btn-success btn-sm" onclick="setStatus(${l.id},'active')">✅ อนุมัติ</button>` : ''}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterTable() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const st = document.getElementById('filter-status').value;
+  const filtered = loans.filter(l => {
+    const matchName = `${l.firstName} ${l.lastName}`.toLowerCase().includes(q);
+    const matchStatus = !st || l.loanStatus === st;
+    return matchName && matchStatus;
+  });
+  renderTable(filtered);
+}
+
+async function setStatus(id, status) {
+  if (!confirm(`ต้องการ${status === 'active' ? 'อนุมัติ' : 'ปรับสถานะ'}สัญญานี้?`)) return;
+  try {
+    await api('PUT', `/api/loans/${id}/status`, { status });
+    toast('อัปเดตสถานะเรียบร้อย', 'success');
+    loadLoans();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+async function openAddModal() {
+  guarantorCount = 0;
+  document.getElementById('guarantors-list').innerHTML = '';
+  document.getElementById('customer-search').value = '';
+  document.getElementById('f-customer-id').value = '';
+  document.getElementById('selected-customer').style.display = 'none';
+  document.getElementById('calc-preview').style.display = 'none';
+  ['f-amount','f-purpose'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('f-rate').value = '15';
+  document.getElementById('f-month').value = '';
+  allCustomers = await api('GET', '/api/customers');
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  document.getElementById('customer-dropdown').innerHTML = '';
+}
+
+function searchCustomer() {
+  const q = document.getElementById('customer-search').value.toLowerCase();
+  const dd = document.getElementById('customer-dropdown');
+  if (!q) { dd.innerHTML = ''; return; }
+  const results = allCustomers.filter(c => `${c.firstName} ${c.lastName} ${c.phone}`.toLowerCase().includes(q)).slice(0, 6);
+  if (results.length === 0) { dd.innerHTML = ''; return; }
+  dd.innerHTML = `<div style="position:absolute;z-index:100;background:#fff;border:1px solid #e5e7eb;border-radius:8px;width:100%;box-shadow:0 4px 12px rgba(0,0,0,0.1);max-height:200px;overflow-y:auto">
+    ${results.map(c => `<div onclick="selectCustomer(${c.id},'${c.firstName} ${c.lastName}','${c.phone||''}','${c.citizenNumber||''}')"
+      style="padding:10px 14px;cursor:pointer;border-bottom:1px solid #f3f4f6;font-size:14px"
+      onmouseover="this.style.background='#f0f9ff'" onmouseout="this.style.background=''"
+    >${c.firstName} ${c.lastName} <span style="color:#6b7280">${c.phone || ''}</span></div>`).join('')}
+  </div>`;
+}
+
+function selectCustomer(id, name, phone, citizen) {
+  document.getElementById('f-customer-id').value = id;
+  document.getElementById('customer-search').value = name;
+  document.getElementById('customer-dropdown').innerHTML = '';
+  const info = document.getElementById('selected-customer');
+  info.innerHTML = `👤 <strong>${name}</strong> &nbsp;|&nbsp; 📞 ${phone} &nbsp;|&nbsp; 🪪 ${citizen || '-'}`;
+  info.style.display = 'block';
+}
+
+function clearCustomer() {
+  document.getElementById('f-customer-id').value = '';
+  document.getElementById('customer-search').value = '';
+  document.getElementById('customer-dropdown').innerHTML = '';
+  document.getElementById('selected-customer').style.display = 'none';
+}
+
+function calcPreview() {
+  const amount = parseFloat(document.getElementById('f-amount').value);
+  const rate = parseFloat(document.getElementById('f-rate').value);
+  const months = parseInt(document.getElementById('f-month').value);
+  if (!amount || !rate || !months) { document.getElementById('calc-preview').style.display = 'none'; return; }
+  const pmt = calcPMT(amount, rate, months);
+  const totalPay = pmt * months;
+  const totalInterest = totalPay - amount;
+  document.getElementById('prev-pmt').textContent = formatMoney(pmt) + ' บ.';
+  document.getElementById('prev-interest').textContent = formatMoney(totalInterest) + ' บ.';
+  document.getElementById('prev-total').textContent = formatMoney(totalPay) + ' บ.';
+  document.getElementById('calc-preview').style.display = 'block';
+}
+
+function addGuarantor() {
+  guarantorCount++;
+  const div = document.createElement('div');
+  div.id = `g-${guarantorCount}`;
+  div.style.cssText = 'background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px;margin-bottom:10px';
+  div.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <strong style="font-size:13px">ผู้ค้ำประกันที่ ${guarantorCount}</strong>
+      <button class="btn btn-danger btn-sm" onclick="document.getElementById('g-${guarantorCount}').remove()">ลบ</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label>ชื่อ-นามสกุล</label><input type="text" class="g-name" placeholder="ชื่อ-นามสกุล"></div>
+      <div class="form-group"><label>เบอร์โทร</label><input type="text" class="g-phone" placeholder="08X-XXX-XXXX"></div>
+      <div class="form-group"><label>เลขบัตรประชาชน</label><input type="text" class="g-citizen" placeholder="13 หลัก"></div>
+      <div class="form-group"><label>ความสัมพันธ์</label><input type="text" class="g-rel" placeholder="เช่น พี่น้อง, คู่สมรส"></div>
+    </div>`;
+  document.getElementById('guarantors-list').appendChild(div);
+}
+
+async function saveLoan() {
+  const customerId = document.getElementById('f-customer-id').value;
+  const amount = document.getElementById('f-amount').value;
+  const rate = document.getElementById('f-rate').value;
+  const month = document.getElementById('f-month').value;
+  const purpose = document.getElementById('f-purpose').value;
+
+  if (!customerId) return toast('กรุณาเลือกลูกหนี้', 'error');
+  if (!amount || !month) return toast('กรุณากรอกวงเงินและจำนวนงวด', 'error');
+
+  const guarantors = [];
+  document.querySelectorAll('#guarantors-list > div').forEach(div => {
+    const name = div.querySelector('.g-name').value.trim();
+    if (name) {
+      guarantors.push({
+        name,
+        phone: div.querySelector('.g-phone').value.trim(),
+        citizenNumber: div.querySelector('.g-citizen').value.trim(),
+        relationship: div.querySelector('.g-rel').value.trim()
+      });
+    }
+  });
+
+  try {
+    const res = await api('POST', '/api/loans', { customer_id: customerId, amount, rate, month, purpose, guarantors });
+    toast(res.message, 'success');
+    closeModal();
+    loadLoans();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+document.getElementById('modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+checkAuth().then(admin => { if (admin) loadLoans(); });
+</script>
+</body>
+</html>

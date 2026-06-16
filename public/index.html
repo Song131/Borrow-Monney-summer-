@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>แดชบอร์ด - ระบบกู้ยืมเงินรายย่อย</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span>💰 MicroLoan</span>
+      <small>ระบบกู้ยืมเงินรายย่อย</small>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/index.html" class="nav-item"><span class="icon">📊</span><span>แดชบอร์ด</span></a>
+      <a href="/customers.html" class="nav-item"><span class="icon">👥</span><span>ลูกหนี้</span></a>
+      <a href="/loans.html" class="nav-item"><span class="icon">📋</span><span>สัญญากู้ยืม</span></a>
+      <a href="/payments.html" class="nav-item"><span class="icon">💳</span><span>การชำระเงิน</span></a>
+    </nav>
+    <div class="sidebar-bottom">
+      แอดมิน: <span id="admin-name">-</span>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title">📊 แดชบอร์ด</div>
+      <button id="logout-btn" class="btn btn-outline btn-sm">ออกจากระบบ</button>
+    </header>
+
+    <div class="content">
+      <!-- Stats -->
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card info">
+          <div class="stat-label">สัญญาที่กำลังดำเนินการ</div>
+          <div class="stat-value" id="stat-active">-</div>
+          <div class="stat-sub">สัญญา</div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-label">รอดำเนินการ</div>
+          <div class="stat-value" id="stat-pending">-</div>
+          <div class="stat-sub">สัญญา</div>
+        </div>
+        <div class="stat-card danger">
+          <div class="stat-label">เกินกำหนด</div>
+          <div class="stat-value" id="stat-overdue">-</div>
+          <div class="stat-sub">สัญญา</div>
+        </div>
+        <div class="stat-card success">
+          <div class="stat-label">ปิดสัญญาแล้ว</div>
+          <div class="stat-value" id="stat-closed">-</div>
+          <div class="stat-sub">สัญญา</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">ยอดหนี้คงค้างทั้งหมด</div>
+          <div class="stat-value" id="stat-outstanding">-</div>
+          <div class="stat-sub">บาท</div>
+        </div>
+      </div>
+
+      <!-- Pending Payments alert -->
+      <div id="pending-payments-alert" style="display:none"></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <!-- Overdue -->
+        <div class="card">
+          <div class="card-title">🔴 สัญญาเกินกำหนดชำระ</div>
+          <div class="table-wrap">
+            <table id="overdue-table">
+              <thead><tr><th>ลูกหนี้</th><th>วงเงิน</th><th>ครบกำหนด</th><th>เกิน</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Upcoming -->
+        <div class="card">
+          <div class="card-title">🟡 ครบกำหนดใน 30 วัน</div>
+          <div class="table-wrap">
+            <table id="upcoming-table">
+              <thead><tr><th>ลูกหนี้</th><th>วงเงิน</th><th>ครบกำหนด</th><th>คงเหลือ</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pending payment approvals -->
+      <div class="card">
+        <div class="card-title">⏳ รายการชำระรอตรวจสอบ</div>
+        <div class="table-wrap">
+          <table id="pending-pay-table">
+            <thead><tr><th>ลูกหนี้</th><th>สัญญา #</th><th>ยอดชำระ</th><th>วันที่</th><th>จัดการ</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="toast-container"></div>
+<script src="/js/app.js"></script>
+<script>
+async function loadDashboard() {
+  try {
+    const data = await api('GET', '/api/dashboard');
+    const s = data.summary;
+    document.getElementById('stat-active').textContent = s.activeLoans || 0;
+    document.getElementById('stat-pending').textContent = s.pendingLoans || 0;
+    document.getElementById('stat-overdue').textContent = s.overdueCount || 0;
+    document.getElementById('stat-closed').textContent = s.closedLoans || 0;
+    document.getElementById('stat-outstanding').textContent = formatMoney(s.totalOutstanding);
+
+    // Overdue
+    const oBody = document.querySelector('#overdue-table tbody');
+    if (data.overdue.length === 0) {
+      oBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#6b7280">ไม่มีสัญญาเกินกำหนด</td></tr>';
+    } else {
+      oBody.innerHTML = data.overdue.map(l => `
+        <tr>
+          <td><a href="/loan-detail.html?id=${l.id}">${l.firstName} ${l.lastName}</a></td>
+          <td>${formatMoney(l.amount)}</td>
+          <td>${formatDate(l.dueDate)}</td>
+          <td style="color:#dc2626;font-weight:600">${daysOverdue(l.dueDate)} วัน</td>
+        </tr>`).join('');
+    }
+
+    // Upcoming
+    const uBody = document.querySelector('#upcoming-table tbody');
+    if (data.upcoming.length === 0) {
+      uBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#6b7280">ไม่มีสัญญาใกล้ครบกำหนด</td></tr>';
+    } else {
+      uBody.innerHTML = data.upcoming.map(l => {
+        const remaining = parseFloat(l.amount) - parseFloat(l.totalPaid);
+        return `<tr>
+          <td><a href="/loan-detail.html?id=${l.id}">${l.firstName} ${l.lastName}</a></td>
+          <td>${formatMoney(l.amount)}</td>
+          <td>${formatDate(l.dueDate)}</td>
+          <td style="color:#d97706">${formatMoney(remaining)}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    // Pending payments
+    const pBody = document.querySelector('#pending-pay-table tbody');
+    if (data.pendingPayments.length === 0) {
+      pBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#6b7280">ไม่มีรายการรอตรวจสอบ</td></tr>';
+    } else {
+      pBody.innerHTML = data.pendingPayments.map(p => `
+        <tr>
+          <td>${p.firstName} ${p.lastName}</td>
+          <td><a href="/loan-detail.html?id=${p.loanId}">#${p.loanId}</a></td>
+          <td style="font-weight:600">${formatMoney(p.payAmount)} บาท</td>
+          <td>${formatDate(p.payDate)}</td>
+          <td>
+            <button class="btn btn-success btn-sm" onclick="approvePayment(${p.id},'อนุมัติ')">✅ อนุมัติ</button>
+            <button class="btn btn-danger btn-sm" onclick="approvePayment(${p.id},'ปฏิเสธ')">❌ ปฏิเสธ</button>
+          </td>
+        </tr>`).join('');
+    }
+  } catch (err) {
+    toast(err.message, 'error');
+  }
+}
+
+async function approvePayment(id, action) {
+  if (!confirm(`ต้องการ${action}รายการชำระนี้?`)) return;
+  try {
+    const res = await api('PUT', `/api/payments/${id}/approve`, { action });
+    toast(res.message, 'success');
+    loadDashboard();
+  } catch (err) {
+    toast(err.message, 'error');
+  }
+}
+
+checkAuth().then(admin => { if (admin) loadDashboard(); });
+</script>
+</body>
+</html>

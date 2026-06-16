@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ลูกหนี้ - ระบบกู้ยืมเงินรายย่อย</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><span>💰 MicroLoan</span><small>ระบบกู้ยืมเงินรายย่อย</small></div>
+    <nav class="sidebar-nav">
+      <a href="/index.html" class="nav-item"><span class="icon">📊</span><span>แดชบอร์ด</span></a>
+      <a href="/customers.html" class="nav-item"><span class="icon">👥</span><span>ลูกหนี้</span></a>
+      <a href="/loans.html" class="nav-item"><span class="icon">📋</span><span>สัญญากู้ยืม</span></a>
+      <a href="/payments.html" class="nav-item"><span class="icon">💳</span><span>การชำระเงิน</span></a>
+    </nav>
+    <div class="sidebar-bottom">แอดมิน: <span id="admin-name">-</span></div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title">👥 ข้อมูลลูกหนี้</div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-primary" onclick="openAddModal()">+ เพิ่มลูกหนี้</button>
+        <button id="logout-btn" class="btn btn-outline btn-sm">ออกจากระบบ</button>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="card">
+        <div class="search-bar">
+          <input type="text" id="search" placeholder="🔍 ค้นหาชื่อ, เบอร์โทร, เลขบัตร..." oninput="filterTable()">
+          <span id="count-label" style="white-space:nowrap;color:#6b7280;font-size:14px"></span>
+        </div>
+        <div class="table-wrap">
+          <table id="customer-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>ชื่อ-นามสกุล</th>
+                <th>เบอร์โทร</th>
+                <th>อาชีพ</th>
+                <th>รายได้/เดือน</th>
+                <th>สัญญา</th>
+                <th>หนี้คงค้าง</th>
+                <th>จัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="customer-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">เพิ่มข้อมูลลูกหนี้</div>
+    <input type="hidden" id="edit-id">
+    <div class="form-grid">
+      <div class="form-group">
+        <label>ชื่อ <span style="color:#dc2626">*</span></label>
+        <input type="text" id="f-firstName" placeholder="ชื่อ">
+      </div>
+      <div class="form-group">
+        <label>นามสกุล <span style="color:#dc2626">*</span></label>
+        <input type="text" id="f-lastName" placeholder="นามสกุล">
+      </div>
+      <div class="form-group">
+        <label>เลขบัตรประชาชน</label>
+        <input type="text" id="f-citizenNumber" placeholder="13 หลัก" maxlength="13">
+      </div>
+      <div class="form-group">
+        <label>เบอร์โทรศัพท์</label>
+        <input type="tel" id="f-phone" placeholder="08X-XXX-XXXX">
+      </div>
+      <div class="form-group">
+        <label>อาชีพ</label>
+        <input type="text" id="f-occupation" placeholder="อาชีพ">
+      </div>
+      <div class="form-group">
+        <label>รายได้ต่อเดือน (บาท)</label>
+        <input type="number" id="f-monthlyIncome" placeholder="0.00" min="0">
+      </div>
+      <div class="form-group full">
+        <label>ที่อยู่</label>
+        <textarea id="f-address" placeholder="ที่อยู่" rows="2"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveCustomer()">💾 บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="/js/app.js"></script>
+<script>
+let customers = [];
+
+async function loadCustomers() {
+  try {
+    customers = await api('GET', '/api/customers');
+    renderTable(customers);
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+function renderTable(data) {
+  const tbody = document.getElementById('customer-body');
+  document.getElementById('count-label').textContent = `ทั้งหมด ${data.length} คน`;
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#6b7280;padding:30px">ยังไม่มีข้อมูลลูกหนี้</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(c => `
+    <tr>
+      <td style="color:#6b7280">${c.id}</td>
+      <td><strong>${c.firstName} ${c.lastName}</strong></td>
+      <td>${c.phone || '-'}</td>
+      <td>${c.occupation || '-'}</td>
+      <td>${c.monthlyIncome ? formatMoney(c.monthlyIncome) + ' บ.' : '-'}</td>
+      <td style="text-align:center">${c.totalLoans || 0}</td>
+      <td style="font-weight:600;color:${c.activeAmount > 0 ? '#dc2626' : '#6b7280'}">${c.activeAmount > 0 ? formatMoney(c.activeAmount) + ' บ.' : '-'}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="editCustomer(${c.id})">✏️</button>
+        <a href="/loans.html?customer=${c.id}" class="btn btn-primary btn-sm">📋 สัญญา</a>
+      </td>
+    </tr>`).join('');
+}
+
+function filterTable() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const filtered = customers.filter(c =>
+    `${c.firstName} ${c.lastName} ${c.phone} ${c.citizenNumber}`.toLowerCase().includes(q)
+  );
+  renderTable(filtered);
+}
+
+function openAddModal() {
+  document.getElementById('modal-title').textContent = 'เพิ่มข้อมูลลูกหนี้';
+  document.getElementById('edit-id').value = '';
+  ['firstName','lastName','citizenNumber','phone','occupation','monthlyIncome','address'].forEach(f => {
+    const el = document.getElementById('f-' + f);
+    if (el) el.value = '';
+  });
+  document.getElementById('modal').classList.add('open');
+}
+
+async function editCustomer(id) {
+  try {
+    const c = await api('GET', `/api/customers/${id}`);
+    document.getElementById('modal-title').textContent = 'แก้ไขข้อมูลลูกหนี้';
+    document.getElementById('edit-id').value = id;
+    document.getElementById('f-firstName').value = c.firstName || '';
+    document.getElementById('f-lastName').value = c.lastName || '';
+    document.getElementById('f-citizenNumber').value = c.citizenNumber || '';
+    document.getElementById('f-phone').value = c.phone || '';
+    document.getElementById('f-occupation').value = c.occupation || '';
+    document.getElementById('f-monthlyIncome').value = c.monthlyIncome || '';
+    document.getElementById('f-address').value = c.address || '';
+    document.getElementById('modal').classList.add('open');
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+async function saveCustomer() {
+  const id = document.getElementById('edit-id').value;
+  const data = {
+    firstName: document.getElementById('f-firstName').value.trim(),
+    lastName: document.getElementById('f-lastName').value.trim(),
+    citizenNumber: document.getElementById('f-citizenNumber').value.trim(),
+    phone: document.getElementById('f-phone').value.trim(),
+    occupation: document.getElementById('f-occupation').value.trim(),
+    monthlyIncome: document.getElementById('f-monthlyIncome').value || null,
+    address: document.getElementById('f-address').value.trim()
+  };
+  if (!data.firstName || !data.lastName) return toast('กรุณากรอกชื่อ-นามสกุล', 'error');
+  try {
+    if (id) await api('PUT', `/api/customers/${id}`, data);
+    else await api('POST', '/api/customers', data);
+    toast(id ? 'แก้ไขข้อมูลเรียบร้อย' : 'เพิ่มลูกหนี้เรียบร้อย', 'success');
+    closeModal();
+    loadCustomers();
+  } catch (err) { toast(err.message, 'error'); }
+}
+
+document.getElementById('modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+checkAuth().then(admin => { if (admin) loadCustomers(); });
+</script>
+</body>
+</html>

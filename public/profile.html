@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>โปรไฟล์ Super Admin - ระบบกู้ยืมเงินรายย่อย</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo"><span>💰 MicroLoan</span><small>ระบบกู้ยืมเงินรายย่อย</small></div>
+    <nav class="sidebar-nav">
+      <a href="/index.html" class="nav-item"><span class="icon">📊</span><span>แดชบอร์ด</span></a>
+      <a href="/customers.html" class="nav-item"><span class="icon">👥</span><span>ลูกหนี้</span></a>
+      <a href="/loans.html" class="nav-item"><span class="icon">📋</span><span>สัญญากู้ยืม</span></a>
+      <a href="/payments.html" class="nav-item"><span class="icon">💳</span><span>การชำระเงิน</span></a>
+    </nav>
+    <div class="sidebar-bottom">แอดมิน: <span id="admin-name">-</span></div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-title">👑 โปรไฟล์ Super Admin</div>
+      <button id="logout-btn" class="btn btn-outline btn-sm">ออกจากระบบ</button>
+    </header>
+
+    <div class="content" style="display:grid;gap:24px;grid-template-columns:1fr 1fr;align-items:start">
+
+      <!-- ===== ข้อมูลส่วนตัว ===== -->
+      <div class="card">
+        <div class="card-title">👤 ข้อมูลส่วนตัว</div>
+
+        <div id="prof-toast" style="display:none;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:8px;padding:10px 14px;font-size:13px;color:#065f46;margin-bottom:16px">✅ บันทึกเรียบร้อย</div>
+        <div id="prof-err"   style="display:none;background:#fef2f2;border:1.5px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:13px;color:#dc2626;margin-bottom:16px"></div>
+
+        <form id="prof-form">
+          <div class="form-group">
+            <label class="form-label">ชื่อผู้ใช้</label>
+            <input type="text" id="p-username" class="form-control" disabled style="background:#f9fafb;color:#6b7280">
+            <div style="font-size:11px;color:#9ca3af;margin-top:4px">ไม่สามารถเปลี่ยนชื่อผู้ใช้ได้</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="form-group">
+              <label class="form-label">ชื่อ</label>
+              <input type="text" id="p-first" class="form-control" placeholder="ชื่อ">
+            </div>
+            <div class="form-group">
+              <label class="form-label">นามสกุล</label>
+              <input type="text" id="p-last" class="form-control" placeholder="นามสกุล">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">อีเมล</label>
+            <input type="email" id="p-email" class="form-control" placeholder="email@example.com">
+          </div>
+
+          <div style="border-top:1px solid #e5e7eb;margin:16px 0 12px"></div>
+          <div style="font-size:13px;font-weight:600;color:#374151;margin-bottom:12px">🔒 เปลี่ยนรหัสผ่าน <span style="font-weight:400;color:#9ca3af">(ไม่บังคับ)</span></div>
+
+          <div class="form-group">
+            <label class="form-label">รหัสผ่านปัจจุบัน</label>
+            <input type="password" id="p-cur-pass" class="form-control" placeholder="••••••••" autocomplete="current-password">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="form-group">
+              <label class="form-label">รหัสผ่านใหม่</label>
+              <input type="password" id="p-new-pass" class="form-control" placeholder="••••••••" autocomplete="new-password">
+            </div>
+            <div class="form-group">
+              <label class="form-label">ยืนยันรหัสผ่านใหม่</label>
+              <input type="password" id="p-confirm-pass" class="form-control" placeholder="••••••••" autocomplete="new-password">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width:100%;margin-top:4px">💾 บันทึกข้อมูลส่วนตัว</button>
+        </form>
+      </div>
+
+      <!-- ===== บัญชีธนาคาร ===== -->
+      <div class="card">
+        <div class="card-title">🏦 บัญชีรับโอนเงิน</div>
+        <p style="font-size:13px;color:#6b7280;margin-top:-8px;margin-bottom:20px">แสดงในสัญญากู้และหน้าชำระเงินของลูกหนี้</p>
+
+        <div id="bank-toast" style="display:none;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:8px;padding:10px 14px;font-size:13px;color:#065f46;margin-bottom:16px">✅ บันทึกเรียบร้อย</div>
+        <div id="bank-err"   style="display:none;background:#fef2f2;border:1.5px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:13px;color:#dc2626;margin-bottom:16px"></div>
+
+        <form id="bank-form">
+          <div class="form-group">
+            <label class="form-label">ชื่อธนาคาร</label>
+            <select id="f-bank" class="form-control">
+              <option value="">-- เลือกธนาคาร --</option>
+              <option>ธนาคารกสิกรไทย (KBank)</option>
+              <option>ธนาคารไทยพาณิชย์ (SCB)</option>
+              <option>ธนาคารกรุงไทย (KTB)</option>
+              <option>ธนาคารกรุงเทพ (BBL)</option>
+              <option>ธนาคารกรุงศรีอยุธยา (BAY)</option>
+              <option>ธนาคารทหารไทยธนชาต (TTB)</option>
+              <option>ธนาคารออมสิน</option>
+              <option>ธนาคารเพื่อการเกษตรและสหกรณ์การเกษตร (ธ.ก.ส.)</option>
+              <option>อื่นๆ</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">เลขที่บัญชี</label>
+            <input type="text" id="f-account" class="form-control" placeholder="XXX-X-XXXXX-X"
+              oninput="this.value=this.value.replace(/[^0-9\-]/g,'')">
+          </div>
+          <div class="form-group">
+            <label class="form-label">ชื่อบัญชี</label>
+            <input type="text" id="f-account-name" class="form-control" placeholder="ชื่อ-นามสกุลเจ้าของบัญชี">
+          </div>
+          <div class="form-group">
+            <label class="form-label">พร้อมเพย์ <span style="font-weight:400;color:#9ca3af">(เบอร์โทร / เลขบัตรประชาชน)</span></label>
+            <input type="text" id="f-promptpay" class="form-control" placeholder="เช่น 0812345678"
+              maxlength="13" oninput="this.value=this.value.replace(/\D/g,'')">
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;margin-top:4px">💾 บันทึกบัญชีธนาคาร</button>
+        </form>
+
+        <!-- Preview -->
+        <div id="preview-box" style="display:none;margin-top:20px;border-top:1px solid #e5e7eb;padding-top:16px">
+          <div style="font-size:12px;font-weight:700;color:#6b7280;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">ตัวอย่างที่ลูกหนี้เห็น</div>
+          <div style="background:#fffbeb;border:1.5px solid #fde68a;border-radius:10px;padding:14px;font-size:13px;line-height:2;color:#374151">
+            <div>🏦 <strong id="pv-bank">-</strong></div>
+            <div>💳 เลขบัญชี: <strong id="pv-account">-</strong></div>
+            <div>👤 ชื่อบัญชี: <strong id="pv-name">-</strong></div>
+            <div id="pv-pp-row" style="display:none">📱 พร้อมเพย์: <strong id="pv-pp">-</strong></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="/js/app.js"></script>
+<script>
+document.getElementById('logout-btn').onclick = async () => {
+  await api('POST', '/api/auth/logout');
+  window.location.href = '/login.html';
+};
+
+function showToast(id, ms = 3000) {
+  const el = document.getElementById(id);
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', ms);
+}
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideErr(id) { document.getElementById(id).style.display = 'none'; }
+
+// โหลดข้อมูลส่วนตัว
+async function loadProfile() {
+  const p = await api('GET', '/api/auth/my-profile');
+  document.getElementById('p-username').value = p.username || '';
+  document.getElementById('p-first').value    = p.First_Name || '';
+  document.getElementById('p-last').value     = p.Last_Name  || '';
+  document.getElementById('p-email').value    = p.email      || '';
+}
+
+// โหลดบัญชีธนาคาร
+async function loadBank() {
+  const b = await api('GET', '/api/auth/bank-info');
+  if (b.bankName)        document.getElementById('f-bank').value = b.bankName;
+  if (b.bankAccount)     document.getElementById('f-account').value = b.bankAccount;
+  if (b.bankAccountName) document.getElementById('f-account-name').value = b.bankAccountName;
+  if (b.promptpayId)     document.getElementById('f-promptpay').value = b.promptpayId;
+  updatePreview(b);
+}
+
+function updatePreview(b) {
+  const hasAny = b.bankName || b.bankAccount || b.bankAccountName || b.promptpayId;
+  document.getElementById('preview-box').style.display = hasAny ? 'block' : 'none';
+  document.getElementById('pv-bank').textContent    = b.bankName || '-';
+  document.getElementById('pv-account').textContent = b.bankAccount || '-';
+  document.getElementById('pv-name').textContent    = b.bankAccountName || '-';
+  const ppRow = document.getElementById('pv-pp-row');
+  if (b.promptpayId) { ppRow.style.display = ''; document.getElementById('pv-pp').textContent = b.promptpayId; }
+  else ppRow.style.display = 'none';
+}
+
+// บันทึกข้อมูลส่วนตัว
+document.getElementById('prof-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  hideErr('prof-err');
+  const newPass     = document.getElementById('p-new-pass').value;
+  const confirmPass = document.getElementById('p-confirm-pass').value;
+  if (newPass && newPass !== confirmPass) return showErr('prof-err', 'รหัสผ่านใหม่ไม่ตรงกัน');
+  try {
+    await api('PUT', '/api/auth/my-profile', {
+      firstName:       document.getElementById('p-first').value.trim(),
+      lastName:        document.getElementById('p-last').value.trim(),
+      email:           document.getElementById('p-email').value.trim(),
+      currentPassword: document.getElementById('p-cur-pass').value,
+      newPassword:     newPass || undefined
+    });
+    showToast('prof-toast');
+    document.getElementById('p-cur-pass').value     = '';
+    document.getElementById('p-new-pass').value     = '';
+    document.getElementById('p-confirm-pass').value = '';
+    // อัปเดตชื่อใน sidebar
+    const nameEl = document.getElementById('admin-name');
+    if (nameEl) {
+      const f = document.getElementById('p-first').value.trim();
+      const l = document.getElementById('p-last').value.trim();
+      nameEl.textContent = (f + ' ' + l).trim() || nameEl.textContent;
+    }
+  } catch (err) { showErr('prof-err', err.message); }
+});
+
+// บันทึกบัญชีธนาคาร
+document.getElementById('bank-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  hideErr('bank-err');
+  const data = {
+    bankName:        document.getElementById('f-bank').value,
+    bankAccount:     document.getElementById('f-account').value.trim(),
+    bankAccountName: document.getElementById('f-account-name').value.trim(),
+    promptpayId:     document.getElementById('f-promptpay').value.trim()
+  };
+  try {
+    await api('PUT', '/api/auth/bank-info', data);
+    showToast('bank-toast');
+    updatePreview(data);
+  } catch (err) { showErr('bank-err', err.message); }
+});
+
+checkAuth().then(admin => {
+  if (admin && admin.id !== 1) window.location.href = '/index.html';
+  else { setActiveNav(); loadProfile(); loadBank(); }
+});
+</script>
+</body>
+</html>

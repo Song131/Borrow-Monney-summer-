@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ระบบกู้ยืมเงินรายย่อย</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body { background: linear-gradient(135deg, #1e3a5f 0%, #065f46 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .home-wrap { text-align: center; color: #fff; padding: 20px; }
+    .home-logo { font-size: 56px; margin-bottom: 12px; }
+    .home-title { font-size: 28px; font-weight: 700; margin-bottom: 6px; }
+    .home-sub { font-size: 15px; opacity: 0.75; margin-bottom: 48px; }
+    .role-cards { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+    .role-card {
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 16px;
+      padding: 32px 28px;
+      width: 220px;
+      cursor: pointer;
+      transition: 0.2s;
+      text-decoration: none;
+      color: #fff;
+    }
+    .role-card:hover { background: rgba(255,255,255,0.22); transform: translateY(-4px); }
+    .role-card .icon { font-size: 40px; margin-bottom: 12px; }
+    .role-card .role-name { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .role-card .role-desc { font-size: 13px; opacity: 0.75; line-height: 1.5; }
+    .footer { margin-top: 40px; font-size: 12px; opacity: 0.5; }
+  </style>
+</head>
+<body>
+<div class="home-wrap">
+  <div class="home-logo">💰</div>
+  <div class="home-title">ระบบกู้ยืมเงินรายย่อย</div>
+  <div class="home-sub">Micro Loan Management System | ดอกเบี้ยไม่เกิน 15% ต่อปี</div>
+
+  <div class="role-cards">
+    <a href="/login.html" class="role-card">
+      <div class="icon">👔</div>
+      <div class="role-name">Admin / Staff</div>
+      <div class="role-desc">จัดการลูกหนี้ สัญญา และอนุมัติการชำระเงิน</div>
+    </a>
+    <a href="/customer-login.html" class="role-card">
+      <div class="icon">👤</div>
+      <div class="role-name">ลูกหนี้</div>
+      <div class="role-desc">ตรวจสอบสัญญาและแนบสลิปชำระเงิน</div>
+    </a>
+  </div>
+
+  <div class="footer">ระบบกู้ยืมเงินรายย่อย v1.0 | บุคคลทั่วไป ตาม ป.พ.พ. มาตรา 654</div>
+</div>
+<script>
+// Auto redirect ถ้า login ไว้แล้ว
+fetch('/api/auth/me',{credentials:'include'}).then(r=>r.ok?r.json():null).then(a=>{if(a)window.location.href='/index.html'});
+fetch('/api/customer/me',{credentials:'include'}).then(r=>r.ok?r.json():null).then(c=>{if(c)window.location.href='/customer/index.html'});
+</script>
+</body>
+</html>
