@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const db = require('../db');
+const { generateSchedule } = require('./_shared/schedule');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, 'uploads/slips/'),
@@ -112,7 +113,15 @@ router.get('/loans/:id', requireCustomer, async (req, res) => {
       'SELECT * FROM payment WHERE loan_id=? ORDER BY payDate DESC',
       [req.params.id]
     );
-    res.json({ loan, payments });
+
+    const schedule = generateSchedule(
+      parseFloat(loan.amount),
+      parseFloat(loan.rate),
+      loan.month,
+      loan.date
+    );
+
+    res.json({ loan, payments, schedule });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
