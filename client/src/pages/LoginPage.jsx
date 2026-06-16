@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { useCustomerAuth } from '../context/CustomerAuthContext';
+import Logomark from '../components/Logomark';
 
 const MODES = { CUSTOMER: 'customer', CUSTOMER_REGISTER: 'creg', ADMIN: 'admin', ADMIN_REGISTER: 'register' };
 
@@ -114,7 +115,7 @@ export default function LoginPage() {
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-logo">
-          <div className="auth-logo-icon">💰</div>
+          <div className="auth-logo-icon"><Logomark size={40} /></div>
           <div className="auth-logo-title">ระบบกู้ยืมเงินรายย่อย</div>
           <div className="auth-logo-sub">Micro Loan Management System</div>
         </div>

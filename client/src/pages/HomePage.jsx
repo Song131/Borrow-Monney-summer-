@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import { useCustomerAuth } from '../context/CustomerAuthContext';
+import Logomark from '../components/Logomark';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ export default function HomePage() {
   return (
     <div className="home-page">
       <div className="home-wrap">
-        <div className="home-logo">💰</div>
+        <div className="home-logo"><Logomark size={56} /></div>
         <div className="home-title">ระบบกู้ยืมเงินรายย่อย</div>
         <div className="home-sub">Micro Loan Management System | ดอกเบี้ยไม่เกิน 15% ต่อปี</div>
 

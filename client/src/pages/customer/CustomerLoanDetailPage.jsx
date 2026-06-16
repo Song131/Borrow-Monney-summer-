@@ -211,7 +211,7 @@ export default function CustomerLoanDetailPage() {
                   <div style={{ textAlign: 'right' }}>
                     <div className={`pay-status ${PAY_STATUS_CLASS[p.stats] || ''}`}>{PAY_STATUS_ICON[p.stats] || ''} {p.stats}</div>
                     {p.cdnurl && (
-                      <a href={p.cdnurl} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: '#1d4ed8', display: 'block', marginTop: 4 }}>
+                      <a href={p.cdnurl} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: 'var(--c-primary)', display: 'block', marginTop: 4 }}>
                         ดูสลิป 🧾
                       </a>
                     )}

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../context/AdminAuthContext';
+import Logomark from '../components/Logomark';
 
 const NAV_ITEMS = [
   { to: '/dashboard', icon: '📊', label: 'แดชบอร์ด' },
@@ -30,8 +31,11 @@ export default function AdminLayout() {
     <div className="layout">
       <aside className="sidebar">
         <div className="sidebar-logo">
-          <span>💰 MicroLoan</span>
-          <small>ระบบกู้ยืมเงินรายย่อย</small>
+          <Logomark size={26} />
+          <div className="sidebar-logo-text">
+            <span>MicroLoan</span>
+            <small>ระบบกู้ยืมเงินรายย่อย</small>
+          </div>
         </div>
         <nav className="sidebar-nav">
           {items.map((item) => (
