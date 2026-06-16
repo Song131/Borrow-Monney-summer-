@@ -9,7 +9,7 @@ export default function DashboardPage() {
   const toast = useToast();
   const [data, setData] = useState(null);
 
-  useEffect(() => setTitle('📊 แดชบอร์ด'), [setTitle]);
+  useEffect(() => setTitle('แดชบอร์ด'), [setTitle]);
 
   const load = useCallback(async () => {
     try {
@@ -70,7 +70,7 @@ export default function DashboardPage() {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
         <div className="card">
-          <div className="card-title">🔴 สัญญาเกินกำหนดชำระ</div>
+          <div className="card-title">สัญญาเกินกำหนดชำระ</div>
           <div className="table-wrap">
             <table>
               <thead>
@@ -95,7 +95,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="card">
-          <div className="card-title">🟡 ครบกำหนดใน 30 วัน</div>
+          <div className="card-title">ครบกำหนดใน 30 วัน</div>
           <div className="table-wrap">
             <table>
               <thead>
@@ -124,7 +124,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="card">
-        <div className="card-title">⏳ รายการชำระรอตรวจสอบ</div>
+        <div className="card-title">รายการชำระรอตรวจสอบ</div>
         <div className="table-wrap">
           <table>
             <thead>
@@ -141,8 +141,8 @@ export default function DashboardPage() {
                     <td style={{ fontWeight: 600 }}>{formatMoney(p.payAmount)} บาท</td>
                     <td>{formatDate(p.payDate)}</td>
                     <td>
-                      <button className="btn btn-success btn-sm" onClick={() => approvePayment(p.id, 'อนุมัติ')}>✅ อนุมัติ</button>{' '}
-                      <button className="btn btn-danger btn-sm" onClick={() => approvePayment(p.id, 'ปฏิเสธ')}>❌ ปฏิเสธ</button>
+                      <button className="btn btn-success btn-sm" onClick={() => approvePayment(p.id, 'อนุมัติ')}>อนุมัติ</button>{' '}
+                      <button className="btn btn-danger btn-sm" onClick={() => approvePayment(p.id, 'ปฏิเสธ')}>ปฏิเสธ</button>
                     </td>
                   </tr>
                 ))

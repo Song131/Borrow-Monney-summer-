@@ -27,7 +27,6 @@ router.get('/me', (req, res) => {
   else res.status(401).json({ error: 'ยังไม่ได้เข้าสู่ระบบ' });
 });
 
-// สมัครสมาชิก (login ได้ทันที)
 router.post('/register', async (req, res) => {
   try {
     const { username, password, firstName, lastName, email } = req.body;
@@ -40,7 +39,6 @@ router.post('/register', async (req, res) => {
       'INSERT INTO Admin (id,username,password,email,First_Name,Last_Name) VALUES (?,?,?,?,?,?)',
       [newId, username, password, email || '', firstName || '', lastName || '']
     );
-    // login ทันทีหลังสมัคร
     req.session.admin = { id: newId, username, name: `${firstName || ''} ${lastName || ''}`.trim() || username };
     res.json({ message: 'สมัครสมาชิกสำเร็จ', admin: req.session.admin });
   } catch (err) {
@@ -69,7 +67,6 @@ function isSuperAdmin(req, res) {
   return true;
 }
 
-// Admin จัดการ Admin คนอื่น
 router.get('/admins', async (req, res) => {
   if (!isSuperAdmin(req, res)) return;
   try {
@@ -121,7 +118,6 @@ router.put('/admins/:id/password', async (req, res) => {
   }
 });
 
-// Super Admin แก้ข้อมูลตัวเอง
 router.get('/my-profile', async (req, res) => {
   if (!req.session.admin) return res.status(401).json({ error: 'ยังไม่ได้เข้าสู่ระบบ' });
   if (req.session.admin.id !== 1) return res.status(403).json({ error: 'เฉพาะ Super Admin เท่านั้น' });
@@ -154,7 +150,6 @@ router.put('/my-profile', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ข้อมูลบัญชีธนาคาร (ใช้ของ Admin id=1 เป็นบัญชีกลาง)
 router.get('/bank-info', async (req, res) => {
   try {
     const [[admin]] = await db.query(

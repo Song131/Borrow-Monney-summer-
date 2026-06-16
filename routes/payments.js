@@ -77,13 +77,12 @@ router.post('/', upload.single('slip'), async (req, res) => {
   }
 });
 
-// Admin อนุมัติ/ปฏิเสธ
 router.put('/:id/approve', async (req, res) => {
   const conn = await db.getConnection();
   try {
     await conn.beginTransaction();
 
-    const { action } = req.body; // 'อนุมัติ' or 'ปฏิเสธ'
+    const { action } = req.body;
     if (!['อนุมัติ', 'ปฏิเสธ'].includes(action))
       return res.status(400).json({ error: 'action ไม่ถูกต้อง' });
 

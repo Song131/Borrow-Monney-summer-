@@ -36,7 +36,7 @@ export default function LoanDetailPage() {
   }, [load]);
 
   useEffect(() => {
-    setTitle(detail ? `📋 สัญญา #${detail.loan.id}` : '📋 สัญญา');
+    setTitle(detail ? `สัญญา #${detail.loan.id}` : 'สัญญา');
   }, [setTitle, detail]);
 
   const progress = useMemo(() => {
@@ -56,14 +56,14 @@ export default function LoanDetailPage() {
     return detail.schedule.map((s) => {
       let status, cls;
       if (cumPaid >= s.payment) {
-        status = '✅ ชำระแล้ว';
+        status = 'ชำระแล้ว';
         cls = 'row-paid';
         cumPaid -= s.payment;
       } else if (new Date(s.dueDate) < now) {
-        status = '⚠️ เกินกำหนด';
+        status = 'เกินกำหนด';
         cls = 'row-overdue';
       } else if (new Date(s.dueDate) <= soon) {
-        status = '🔔 ใกล้ครบกำหนด';
+        status = 'ใกล้ครบกำหนด';
         cls = 'row-near';
       } else {
         status = 'รอชำระ';
@@ -197,23 +197,23 @@ export default function LoanDetailPage() {
             <div className="card-title">การจัดการ</div>
             {loan.loanStatus === 'pending' && (
               <div style={{ display: 'flex', gap: 10 }}>
-                <button className="btn btn-success" onClick={() => setStatus('active')}>✅ อนุมัติ</button>
-                <button className="btn btn-danger" onClick={() => setStatus('rejected')}>❌ ปฏิเสธ</button>
+                <button className="btn btn-success" onClick={() => setStatus('active')}>อนุมัติ</button>
+                <button className="btn btn-danger" onClick={() => setStatus('rejected')}>ปฏิเสธ</button>
               </div>
             )}
             {loan.loanStatus === 'active' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <button className="btn btn-primary" onClick={openPaymentModal}>💳 บันทึกการชำระเงิน</button>
+                <button className="btn btn-primary" onClick={openPaymentModal}>บันทึกการชำระเงิน</button>
                 <button className="btn btn-outline" onClick={() => setStatus('closed')}>ปิดสัญญา</button>
               </div>
             )}
-            {loan.loanStatus === 'closed' && <div className="alert alert-success">✅ ปิดสัญญาแล้ว</div>}
+            {loan.loanStatus === 'closed' && <div className="alert alert-success">ปิดสัญญาแล้ว</div>}
             <button
               className="btn btn-outline btn-sm"
               style={{ marginTop: 10, width: '100%' }}
               onClick={() => window.open(`/api/loans/${id}/contract`, '_blank')}
             >
-              🖨️ สัญญา PDF
+              สัญญา PDF
             </button>
           </div>
         </div>

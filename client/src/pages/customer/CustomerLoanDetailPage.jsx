@@ -7,9 +7,8 @@ import { calcPMT } from '../../lib/loan';
 import Modal from '../../components/Modal';
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
-const STATUS_LABELS = { active: '🟢 กำลังดำเนินการ', pending: '🟡 รอดำเนินการ', closed: '✅ ปิดสัญญา', rejected: '🔴 ปฏิเสธ' };
+const STATUS_LABELS = { active: 'กำลังดำเนินการ', pending: 'รอดำเนินการ', closed: 'ปิดสัญญา', rejected: 'ปฏิเสธ' };
 const PAY_STATUS_CLASS = { 'อนุมัติ': 'st-approve', 'รอตรวจ': 'st-wait', 'ปฏิเสธ': 'st-reject' };
-const PAY_STATUS_ICON = { 'อนุมัติ': '✅', 'รอตรวจ': '⏳', 'ปฏิเสธ': '❌' };
 
 export default function CustomerLoanDetailPage() {
   const { id } = useParams();
@@ -63,14 +62,14 @@ export default function CustomerLoanDetailPage() {
       let badge;
       if (cumPaid >= s.payment) {
         cls = 'row-paid';
-        badge = <span style={{ fontSize: 11, color: '#16a34a', fontWeight: 700 }}>✅ ชำระแล้ว</span>;
+        badge = <span style={{ fontSize: 11, color: '#16a34a', fontWeight: 700 }}>ชำระแล้ว</span>;
         cumPaid -= s.payment;
       } else if (new Date(s.dueDate) < now) {
         cls = 'row-overdue';
-        badge = <span style={{ fontSize: 11, color: '#dc2626', fontWeight: 700 }}>⚠️ เกินกำหนด</span>;
+        badge = <span style={{ fontSize: 11, color: '#dc2626', fontWeight: 700 }}>เกินกำหนด</span>;
       } else if (new Date(s.dueDate) <= soon) {
         cls = 'row-near';
-        badge = <span style={{ fontSize: 11, color: '#d97706', fontWeight: 700 }}>🔔 ใกล้ครบ</span>;
+        badge = <span style={{ fontSize: 11, color: '#d97706', fontWeight: 700 }}>ใกล้ครบ</span>;
       } else {
         badge = <span style={{ fontSize: 11, color: '#9ca3af' }}>รอชำระ</span>;
       }
@@ -134,7 +133,7 @@ export default function CustomerLoanDetailPage() {
           <div className="c-header-sub">{STATUS_LABELS[loan.loanStatus] || loan.loanStatus}</div>
         </div>
         <button className="btn btn-outline btn-sm c-header-print" onClick={() => window.open(`/api/loans/${id}/contract`, '_blank')}>
-          🖨️ สัญญา
+          สัญญา
         </button>
       </div>
 
@@ -152,12 +151,12 @@ export default function CustomerLoanDetailPage() {
             <div className="hero-bar"><div className="hero-bar-fill" style={{ width: `${computed.pct}%` }} /></div>
           </div>
           <button className="pay-btn" disabled={loan.loanStatus !== 'active'} onClick={openPay}>
-            {loan.loanStatus === 'active' ? '💳 ชำระเงิน / แนบสลิป' : loan.loanStatus === 'closed' ? '✅ ปิดสัญญาแล้ว' : '⏳ รอ Admin อนุมัติสัญญา'}
+            {loan.loanStatus === 'active' ? 'ชำระเงิน / แนบสลิป' : loan.loanStatus === 'closed' ? 'ปิดสัญญาแล้ว' : 'รอ Admin อนุมัติสัญญา'}
           </button>
         </div>
 
         <div className="c-card">
-          <div className="c-card-title">📋 ข้อมูลสัญญา</div>
+          <div className="c-card-title">ข้อมูลสัญญา</div>
           <div className="info-row"><span className="lbl">วงเงินกู้</span><span className="val">{formatMoney(computed.amount)} บาท</span></div>
           <div className="info-row"><span className="lbl">อัตราดอกเบี้ย</span><span className="val">{loan.rate}% / ปี (ลดต้นลดดอก)</span></div>
           <div className="info-row"><span className="lbl">จำนวนงวด</span><span className="val">{loan.month} งวด</span></div>
@@ -166,14 +165,14 @@ export default function CustomerLoanDetailPage() {
           <div className="info-row">
             <span className="lbl">วันครบกำหนด</span>
             <span className="val" style={{ color: computed.overdue ? '#dc2626' : 'inherit' }}>
-              {formatDate(loan.dueDate)}{computed.overdue ? ' ⚠️' : ''}
+              {formatDate(loan.dueDate)}
             </span>
           </div>
           <div className="info-row"><span className="lbl">วัตถุประสงค์</span><span className="val">{loan.purpose || '-'}</span></div>
         </div>
 
         <div className="c-card">
-          <div className="c-card-title">📅 ตารางผ่อนชำระ</div>
+          <div className="c-card-title">ตารางผ่อนชำระ</div>
           <div style={{ overflowX: 'auto' }}>
             <table className="sch-table">
               <thead>
@@ -197,7 +196,7 @@ export default function CustomerLoanDetailPage() {
         </div>
 
         <div className="c-card">
-          <div className="c-card-title">🧾 ประวัติการชำระ</div>
+          <div className="c-card-title">ประวัติการชำระ</div>
           {payments.length === 0 ? (
             <div style={{ textAlign: 'center', color: '#9ca3af', padding: 16, fontSize: 14 }}>ยังไม่มีประวัติการชำระ</div>
           ) : (
@@ -209,17 +208,17 @@ export default function CustomerLoanDetailPage() {
                     <div style={{ color: '#9ca3af', fontSize: 12, marginTop: 3 }}>{formatDate(p.payDate)} · {p.method || 'โอน'}</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div className={`pay-status ${PAY_STATUS_CLASS[p.stats] || ''}`}>{PAY_STATUS_ICON[p.stats] || ''} {p.stats}</div>
+                    <div className={`pay-status ${PAY_STATUS_CLASS[p.stats] || ''}`}>{p.stats}</div>
                     {p.cdnurl && (
                       <a href={p.cdnurl} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: 'var(--c-primary)', display: 'block', marginTop: 4 }}>
-                        ดูสลิป 🧾
+                        ดูสลิป
                       </a>
                     )}
                   </div>
                 </div>
                 {p.stats === 'ปฏิเสธ' && (
                   <div style={{ marginTop: 8, background: '#fee2e2', color: '#7f1d1d', borderRadius: 6, padding: '7px 10px', fontSize: 12 }}>
-                    ❌ รายการนี้ถูกปฏิเสธ กรุณาติดต่อ Admin
+                    รายการนี้ถูกปฏิเสธ กรุณาติดต่อ Admin
                   </div>
                 )}
               </div>
@@ -229,16 +228,16 @@ export default function CustomerLoanDetailPage() {
       </div>
 
       <Modal open={payModalOpen} onClose={() => setPayModalOpen(false)} variant="sheet">
-        <div className="modal-title">💳 ชำระเงิน</div>
-        <div className="pay-hint-box">💡 ค่างวดปกติ <strong>{formatMoney(computed.pmt)}</strong> บาท/เดือน</div>
+        <div className="modal-title">ชำระเงิน</div>
+        <div className="pay-hint-box">ค่างวดปกติ <strong>{formatMoney(computed.pmt)}</strong> บาท/เดือน</div>
         {bankInfo && (
           <div className="bank-info-box">
-            <div className="bank-info-title">📤 โอนเงินมาที่</div>
+            <div className="bank-info-title">โอนเงินมาที่</div>
             <div className="bank-info-content">
-              {bankInfo.bankName && <div>🏦 {bankInfo.bankName}</div>}
-              <div>💳 เลขบัญชี: <strong>{bankInfo.bankAccount}</strong></div>
-              {bankInfo.bankAccountName && <div>👤 ชื่อบัญชี: <strong>{bankInfo.bankAccountName}</strong></div>}
-              {bankInfo.promptpayId && <div>📱 พร้อมเพย์: <strong>{bankInfo.promptpayId}</strong></div>}
+              {bankInfo.bankName && <div>{bankInfo.bankName}</div>}
+              <div>เลขบัญชี: <strong>{bankInfo.bankAccount}</strong></div>
+              {bankInfo.bankAccountName && <div>ชื่อบัญชี: <strong>{bankInfo.bankAccountName}</strong></div>}
+              {bankInfo.promptpayId && <div>พร้อมเพย์: <strong>{bankInfo.promptpayId}</strong></div>}
             </div>
           </div>
         )}
@@ -259,7 +258,7 @@ export default function CustomerLoanDetailPage() {
           <input type="file" accept="image/*" onChange={handleSlipChange} />
           {slipPreview && <img src={slipPreview} className="slip-preview-sheet" alt="ตัวอย่างสลิป" />}
         </div>
-        <button className="submit-btn" onClick={submitPay}>📤 ส่งหลักฐานการชำระ</button>
+        <button className="submit-btn" onClick={submitPay}>ส่งหลักฐานการชำระ</button>
         <button className="cancel-btn" onClick={() => setPayModalOpen(false)}>ยกเลิก</button>
       </Modal>
     </div>

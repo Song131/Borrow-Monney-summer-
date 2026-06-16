@@ -4,14 +4,14 @@ import { useAdminAuth } from '../context/AdminAuthContext';
 import Logomark from '../components/Logomark';
 
 const NAV_ITEMS = [
-  { to: '/dashboard', icon: '📊', label: 'แดชบอร์ด' },
-  { to: '/customers', icon: '👥', label: 'ลูกหนี้' },
-  { to: '/loans', icon: '📋', label: 'สัญญากู้ยืม' },
-  { to: '/payments', icon: '💳', label: 'การชำระเงิน' },
+  { to: '/dashboard', label: 'แดชบอร์ด' },
+  { to: '/customers', label: 'ลูกหนี้' },
+  { to: '/loans', label: 'สัญญากู้ยืม' },
+  { to: '/payments', label: 'การชำระเงิน' },
 ];
 
 const SUPER_ADMIN_NAV_ITEMS = [
-  { to: '/admins', icon: '⚙️', label: 'จัดการแอดมิน' },
+  { to: '/admins', label: 'จัดการแอดมิน' },
   { to: '/profile', icon: '🏦', label: 'ตั้งค่าบัญชี' },
 ];
 
@@ -44,7 +44,7 @@ export default function AdminLayout() {
               to={item.to}
               className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}
             >
-              <span className="icon">{item.icon}</span>
+              {item.icon && <span className="icon">{item.icon}</span>}
               <span>{item.label}</span>
             </NavLink>
           ))}

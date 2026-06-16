@@ -11,7 +11,7 @@ export default function AdminsPage() {
   const { setTitle } = useOutletContext();
   const toast = useToast();
   const { admin: currentAdmin } = useAdminAuth();
-  useEffect(() => setTitle('⚙️ จัดการแอดมิน'), [setTitle]);
+  useEffect(() => setTitle('จัดการแอดมิน'), [setTitle]);
 
   const [admins, setAdmins] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -81,7 +81,7 @@ export default function AdminsPage() {
 
   return (
     <>
-      <div className="alert alert-info">ℹ️ แอดมินทุกคนมีสิทธิ์เท่ากันในการจัดการระบบ</div>
+      <div className="alert alert-info">แอดมินทุกคนมีสิทธิ์เท่ากันในการจัดการระบบ</div>
 
       <div className="card">
         <div className="card-title">รายชื่อแอดมิน</div>

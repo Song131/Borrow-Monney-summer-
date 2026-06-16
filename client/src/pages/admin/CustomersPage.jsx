@@ -10,7 +10,7 @@ const EMPTY_FORM = { firstName: '', lastName: '', citizenNumber: '', phone: '', 
 export default function CustomersPage() {
   const { setTitle } = useOutletContext();
   const toast = useToast();
-  useEffect(() => setTitle('👥 ลูกหนี้'), [setTitle]);
+  useEffect(() => setTitle('ลูกหนี้'), [setTitle]);
 
   const [customers, setCustomers] = useState([]);
   const [search, setSearch] = useState('');

@@ -160,12 +160,12 @@ export default function ProfilePage() {
 
         {bank.bankAccount && (
           <div className="bank-info-box" style={{ marginTop: 16 }}>
-            <div className="bank-info-title">👁️ ตัวอย่างที่ลูกหนี้จะเห็น</div>
+            <div className="bank-info-title">ตัวอย่างที่ลูกหนี้จะเห็น</div>
             <div className="bank-info-content">
-              {bank.bankName && <div>🏦 {bank.bankName}</div>}
-              <div>💳 เลขบัญชี: <strong>{bank.bankAccount}</strong></div>
-              {bank.bankAccountName && <div>👤 ชื่อบัญชี: <strong>{bank.bankAccountName}</strong></div>}
-              {bank.promptpayId && <div>📱 พร้อมเพย์: <strong>{bank.promptpayId}</strong></div>}
+              {bank.bankName && <div>{bank.bankName}</div>}
+              <div>เลขบัญชี: <strong>{bank.bankAccount}</strong></div>
+              {bank.bankAccountName && <div>ชื่อบัญชี: <strong>{bank.bankAccountName}</strong></div>}
+              {bank.promptpayId && <div>พร้อมเพย์: <strong>{bank.promptpayId}</strong></div>}
             </div>
           </div>
         )}

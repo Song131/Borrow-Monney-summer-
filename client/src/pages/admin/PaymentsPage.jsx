@@ -8,7 +8,7 @@ import Modal from '../../components/Modal';
 export default function PaymentsPage() {
   const { setTitle } = useOutletContext();
   const toast = useToast();
-  useEffect(() => setTitle('💳 การชำระเงิน'), [setTitle]);
+  useEffect(() => setTitle('การชำระเงิน'), [setTitle]);
 
   const [pending, setPending] = useState([]);
   const [slipViewUrl, setSlipViewUrl] = useState(null);
@@ -39,14 +39,14 @@ export default function PaymentsPage() {
 
   return (
     <>
-      <div className="alert alert-info">ℹ️ เมื่ออนุมัติรายการชำระ ระบบจะหักยอดชำระจากสัญญาโดยอัตโนมัติ</div>
+      <div className="alert alert-info">เมื่ออนุมัติรายการชำระ ระบบจะหักยอดชำระจากสัญญาโดยอัตโนมัติ</div>
 
       <div className="card">
         <div className="card-title">
           รายการชำระรอตรวจสอบ {pending.length > 0 && <span className="badge badge-wait">{pending.length}</span>}
         </div>
         {pending.length === 0 ? (
-          <div className="alert alert-success">✅ ไม่มีรายการรอตรวจสอบ</div>
+          <div className="alert alert-success">ไม่มีรายการรอตรวจสอบ</div>
         ) : (
           <div className="table-wrap">
             <table>
@@ -64,8 +64,8 @@ export default function PaymentsPage() {
                     <td>{formatDate(p.payDate)}</td>
                     <td>{p.cdnurl ? <button className="btn btn-outline btn-sm" onClick={() => setSlipViewUrl(p.cdnurl)}>ดูสลิป</button> : '-'}</td>
                     <td>
-                      <button className="btn btn-success btn-sm" onClick={() => approve(p.id, 'อนุมัติ')}>✅ อนุมัติ</button>{' '}
-                      <button className="btn btn-danger btn-sm" onClick={() => approve(p.id, 'ปฏิเสธ')}>❌ ปฏิเสธ</button>
+                      <button className="btn btn-success btn-sm" onClick={() => approve(p.id, 'อนุมัติ')}>อนุมัติ</button>{' '}
+                      <button className="btn btn-danger btn-sm" onClick={() => approve(p.id, 'ปฏิเสธ')}>ปฏิเสธ</button>
                     </td>
                   </tr>
                 ))}

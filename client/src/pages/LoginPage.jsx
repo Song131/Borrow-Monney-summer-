@@ -57,8 +57,8 @@ export default function LoginPage() {
   const matchHint = !rConfirm
     ? null
     : rPass === rConfirm
-      ? { text: '✅ รหัสผ่านตรงกัน', color: '#16a34a' }
-      : { text: '❌ รหัสผ่านไม่ตรงกัน', color: '#dc2626' };
+      ? { text: 'รหัสผ่านตรงกัน', color: '#16a34a' }
+      : { text: 'รหัสผ่านไม่ตรงกัน', color: '#dc2626' };
 
   async function submitCustomerLogin(e) {
     e.preventDefault();
@@ -121,8 +121,8 @@ export default function LoginPage() {
         </div>
 
         <div className={`panel${mode === MODES.CUSTOMER ? ' active' : ''}`}>
-          <div className="mode-label customer">👤 ลูกหนี้</div>
-          {cErr && <div className="err">❌ {cErr}</div>}
+          <div className="mode-label customer">ลูกหนี้</div>
+          {cErr && <div className="err">{cErr}</div>}
           <form onSubmit={submitCustomerLogin}>
             <div className="fg">
               <label>เลขบัตรประชาชน</label>
@@ -142,8 +142,8 @@ export default function LoginPage() {
         </div>
 
         <div className={`panel${mode === MODES.CUSTOMER_REGISTER ? ' active' : ''}`}>
-          <div className="mode-label customer">📝 สมัครสมาชิก ลูกหนี้</div>
-          {crErr && <div className="err">❌ {crErr}</div>}
+          <div className="mode-label customer">สมัครสมาชิก ลูกหนี้</div>
+          {crErr && <div className="err">{crErr}</div>}
           <form onSubmit={submitCustomerRegister}>
             <div className="fg">
               <label>ชื่อ <span style={{ color: '#dc2626' }}>*</span></label>
@@ -182,8 +182,8 @@ export default function LoginPage() {
         </div>
 
         <div className={`panel admin${mode === MODES.ADMIN ? ' active' : ''}`}>
-          <div className="mode-label admin">👔 Admin / Staff</div>
-          {aErr && <div className="err">❌ {aErr}</div>}
+          <div className="mode-label admin">Admin / Staff</div>
+          {aErr && <div className="err">{aErr}</div>}
           <form onSubmit={submitAdminLogin}>
             <div className="fg">
               <label>ชื่อผู้ใช้</label>
@@ -193,7 +193,7 @@ export default function LoginPage() {
               <label>รหัสผ่าน</label>
               <div className="pw-wrap">
                 <input type={aPassVisible ? 'text' : 'password'} autoComplete="current-password" placeholder="รหัสผ่าน" required value={aPass} onChange={(e) => setAPass(e.target.value)} />
-                <button type="button" className="pw-eye" onClick={() => setAPassVisible((v) => !v)}>{aPassVisible ? '🙈' : '👁️'}</button>
+                <button type="button" className="pw-eye" onClick={() => setAPassVisible((v) => !v)}>{aPassVisible ? 'ซ่อน' : 'แสดง'}</button>
               </div>
             </div>
             <button type="submit" className="btn-admin">เข้าสู่ระบบ Admin</button>
@@ -205,8 +205,8 @@ export default function LoginPage() {
         </div>
 
         <div className={`panel admin${mode === MODES.ADMIN_REGISTER ? ' active' : ''}`}>
-          <div className="mode-label admin">📝 สมัคร Admin / Staff</div>
-          {rErr && <div className="err">❌ {rErr}</div>}
+          <div className="mode-label admin">สมัคร Admin / Staff</div>
+          {rErr && <div className="err">{rErr}</div>}
           <form onSubmit={submitAdminRegister}>
             <div className="fg">
               <label>ชื่อ</label>
@@ -224,14 +224,14 @@ export default function LoginPage() {
               <label>รหัสผ่าน <span style={{ color: '#dc2626' }}>*</span></label>
               <div className="pw-wrap">
                 <input type={rPassVisible ? 'text' : 'password'} placeholder="อย่างน้อย 6 ตัว" value={rPass} onChange={(e) => setRPass(e.target.value)} />
-                <button type="button" className="pw-eye" onClick={() => setRPassVisible((v) => !v)}>{rPassVisible ? '🙈' : '👁️'}</button>
+                <button type="button" className="pw-eye" onClick={() => setRPassVisible((v) => !v)}>{rPassVisible ? 'ซ่อน' : 'แสดง'}</button>
               </div>
             </div>
             <div className="fg" style={{ marginBottom: 20 }}>
               <label>ยืนยันรหัสผ่าน <span style={{ color: '#dc2626' }}>*</span></label>
               <div className="pw-wrap">
                 <input type={rConfirmVisible ? 'text' : 'password'} placeholder="กรอกรหัสผ่านอีกครั้ง" value={rConfirm} onChange={(e) => setRConfirm(e.target.value)} />
-                <button type="button" className="pw-eye" onClick={() => setRConfirmVisible((v) => !v)}>{rConfirmVisible ? '🙈' : '👁️'}</button>
+                <button type="button" className="pw-eye" onClick={() => setRConfirmVisible((v) => !v)}>{rConfirmVisible ? 'ซ่อน' : 'แสดง'}</button>
               </div>
               {matchHint && <div style={{ fontSize: 12, marginTop: 4, color: matchHint.color }}>{matchHint.text}</div>}
             </div>

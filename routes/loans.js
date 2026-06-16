@@ -170,7 +170,7 @@ router.get('/:id/contract', async (req, res) => {
 </head>
 <body>
   <div class="no-print" style="text-align:center">
-    <button class="btn-print" onclick="window.print()">🖨️ พิมพ์ / บันทึก PDF</button>
+    <button class="btn-print" onclick="window.print()">พิมพ์ / บันทึก PDF</button>
   </div>
 
   <h2>สัญญากู้ยืมเงิน</h2>

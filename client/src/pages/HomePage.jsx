@@ -26,12 +26,10 @@ export default function HomePage() {
 
         <div className="role-cards">
           <Link to="/login" className="role-card">
-            <div className="icon">👔</div>
             <div className="role-name">Admin / Staff</div>
             <div className="role-desc">จัดการลูกหนี้ สัญญา และอนุมัติการชำระเงิน</div>
           </Link>
           <Link to="/customer/login" className="role-card">
-            <div className="icon">👤</div>
             <div className="role-name">ลูกหนี้</div>
             <div className="role-desc">ตรวจสอบสัญญาและแนบสลิปชำระเงิน</div>
           </Link>

@@ -1,4 +1,3 @@
-// ดอกเบี้ยลดต้นลดดอก — ใช้ร่วมกันทั้งฝั่ง admin (routes/loans.js) และลูกหนี้ (routes/customer.js)
 function calcPMT(principal, monthlyRate, months) {
   if (monthlyRate === 0) return principal / months;
   return (principal * monthlyRate * Math.pow(1 + monthlyRate, months)) /

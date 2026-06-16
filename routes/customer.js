@@ -18,7 +18,6 @@ const upload = multer({
   }
 });
 
-// สมัครสมาชิกลูกหนี้ → login ได้เลย
 router.post('/register', async (req, res) => {
   try {
     const { firstName, lastName, citizenNumber, phone, address, occupation, monthlyIncome } = req.body;
@@ -42,7 +41,6 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Login ลูกหนี้
 router.post('/login', async (req, res) => {
   try {
     const { citizenNumber, phone } = req.body;
@@ -74,7 +72,6 @@ function requireCustomer(req, res, next) {
   next();
 }
 
-// ข้อมูลส่วนตัว + สัญญาทั้งหมด
 router.get('/loans', requireCustomer, async (req, res) => {
   try {
     const cid = req.session.customer.id;
@@ -94,7 +91,6 @@ router.get('/loans', requireCustomer, async (req, res) => {
   }
 });
 
-// รายละเอียดสัญญา 1 รายการ
 router.get('/loans/:id', requireCustomer, async (req, res) => {
   try {
     const cid = req.session.customer.id;
@@ -127,7 +123,6 @@ router.get('/loans/:id', requireCustomer, async (req, res) => {
   }
 });
 
-// ยื่นขอกู้ (สร้าง loan ที่ status = pending รอ Admin อนุมัติ)
 router.post('/request-loan', requireCustomer, async (req, res) => {
   try {
     const cid = req.session.customer.id;
@@ -147,7 +142,6 @@ router.post('/request-loan', requireCustomer, async (req, res) => {
       [newLoanId, startDate, parseFloat(amount), month, dueDate, purpose || null, 'pending', cid, admin.id]
     );
 
-    // บันทึกผู้ค้ำประกัน
     if (guarantors && guarantors.length > 0) {
       const [[{ maxGId }]] = await db.query('SELECT COALESCE(MAX(id),0) as maxGId FROM guarantor');
       let gId = maxGId + 1;
@@ -166,7 +160,6 @@ router.post('/request-loan', requireCustomer, async (req, res) => {
   }
 });
 
-// ข้อมูลส่วนตัวลูกหนี้
 router.get('/profile', requireCustomer, async (req, res) => {
   try {
     const [[cust]] = await db.query('SELECT * FROM customer WHERE id=?', [req.session.customer.id]);
@@ -176,7 +169,6 @@ router.get('/profile', requireCustomer, async (req, res) => {
   }
 });
 
-// แนบสลิปชำระเงิน
 router.post('/loans/:id/pay', requireCustomer, upload.single('slip'), async (req, res) => {
   try {
     const cid = req.session.customer.id;

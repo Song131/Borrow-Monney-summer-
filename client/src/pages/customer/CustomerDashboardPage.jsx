@@ -8,7 +8,7 @@ import { calcPMT } from '../../lib/loan';
 import Modal from '../../components/Modal';
 
 const MONTH_OPTIONS = [3, 6, 12, 18, 24, 36];
-const STATUS_LABELS = { active: '🟢 กำลังดำเนินการ', pending: '🟡 รออนุมัติ', closed: '✅ ปิดสัญญา', rejected: '🔴 ปฏิเสธ' };
+const STATUS_LABELS = { active: 'กำลังดำเนินการ', pending: 'รออนุมัติ', closed: 'ปิดสัญญา', rejected: 'ปฏิเสธ' };
 const RELATIONSHIPS = ['คู่สมรส', 'บิดา/มารดา', 'พี่/น้อง', 'บุตร', 'ญาติ', 'เพื่อน', 'อื่นๆ'];
 
 function emptyGuarantor() {
@@ -107,7 +107,7 @@ export default function CustomerDashboardPage() {
       <div className="c-header">
         <div className="c-header-top">
           <div>
-            <div className="greeting">ยินดีต้อนรับ 👋</div>
+            <div className="greeting">ยินดีต้อนรับ</div>
             <div className="c-name">{customer?.name || '-'}</div>
           </div>
           <button className="logout-btn" onClick={handleLogout}>ออกจากระบบ</button>
@@ -122,7 +122,6 @@ export default function CustomerDashboardPage() {
       <div className="c-content">
         <div className="section-title">บริการ</div>
         <button className="request-card" onClick={openRequest}>
-          <div className="request-icon">📝</div>
           <div className="request-text" style={{ flex: 1 }}>
             <div className="title">ยื่นขอกู้ยืมเงิน</div>
             <div className="sub">วงเงินสูงสุด 50,000 บาท | ดอกเบี้ย 15%/ปี</div>
@@ -133,7 +132,6 @@ export default function CustomerDashboardPage() {
         <div className="section-title">สัญญากู้ยืมของฉัน</div>
         {loans.length === 0 ? (
           <div className="empty">
-            <div className="e-icon">📋</div>
             <div className="e-text">ยังไม่มีสัญญากู้ยืม<br />กด <strong>"ยื่นขอกู้ยืมเงิน"</strong> ด้านบนเพื่อเริ่มต้น</div>
           </div>
         ) : (
@@ -152,7 +150,7 @@ export default function CustomerDashboardPage() {
                     <div className="lc-amount">{formatMoney(amt)} <span style={{ fontSize: 14, fontWeight: 400, color: '#6b7280' }}>บาท</span></div>
                     <div className="lc-meta">{l.rate}%/ปี · {l.month} งวด · {formatMoney(pmt)} บ./เดือน</div>
                   </div>
-                  <div className="lc-status">{STATUS_LABELS[l.loanStatus] || l.loanStatus}{overdue ? ' ⚠️' : ''}</div>
+                  <div className="lc-status">{STATUS_LABELS[l.loanStatus] || l.loanStatus}</div>
                 </div>
                 <div className="prog-wrap">
                   <div className="prog"><div className="prog-fill" style={{ width: `${pct}%` }} /></div>
@@ -169,11 +167,11 @@ export default function CustomerDashboardPage() {
       </div>
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} variant="sheet">
-        <div className="modal-title">📝 ยื่นขอกู้ยืมเงิน</div>
+        <div className="modal-title">ยื่นขอกู้ยืมเงิน</div>
         <div className="modal-sub">กรอกข้อมูลแล้ว Admin จะตรวจสอบและอนุมัติ</div>
 
         <div className="alert alert-warning" style={{ fontSize: 12 }}>
-          ⚖️ อัตราดอกเบี้ยตามกฎหมาย ป.พ.พ. มาตรา 654 ไม่เกิน <strong>15% ต่อปี</strong>
+          อัตราดอกเบี้ยตามกฎหมาย ป.พ.พ. มาตรา 654 ไม่เกิน <strong>15% ต่อปี</strong>
         </div>
 
         <div className="fg">
@@ -192,7 +190,7 @@ export default function CustomerDashboardPage() {
 
         {preview && (
           <div className="calc-box">
-            <div className="calc-box-title">📊 ประมาณการค่างวด</div>
+            <div className="calc-box-title">ประมาณการค่างวด</div>
             <div className="calc-grid">
               <div className="calc-item"><div className="cv">{formatMoney(preview.pmt)} บ.</div><div className="cl">ค่างวด/เดือน</div></div>
               <div className="calc-item"><div className="cv">{formatMoney(preview.interest)} บ.</div><div className="cl">ดอกเบี้ยรวม</div></div>
@@ -209,7 +207,7 @@ export default function CustomerDashboardPage() {
         <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: 16, marginBottom: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 700 }}>🤝 ผู้ค้ำประกัน</div>
+              <div style={{ fontSize: 14, fontWeight: 700 }}>ผู้ค้ำประกัน</div>
               <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>ไม่บังคับ — เพิ่มเพื่อเพิ่มโอกาสอนุมัติ</div>
             </div>
             <button type="button" className="guarantor-add" onClick={addGuarantor}>+ เพิ่ม</button>
@@ -253,7 +251,7 @@ export default function CustomerDashboardPage() {
           ))}
         </div>
 
-        <button className="submit-btn" onClick={submitRequest}>📤 ยื่นขอกู้</button>
+        <button className="submit-btn" onClick={submitRequest}>ยื่นขอกู้</button>
         <button className="cancel-btn" onClick={() => setModalOpen(false)}>ยกเลิก</button>
       </Modal>
     </div>

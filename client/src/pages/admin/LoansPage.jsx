@@ -22,7 +22,7 @@ function emptyGuarantor() {
 export default function LoansPage() {
   const { setTitle } = useOutletContext();
   const toast = useToast();
-  useEffect(() => setTitle('📋 สัญญากู้ยืม'), [setTitle]);
+  useEffect(() => setTitle('สัญญากู้ยืม'), [setTitle]);
 
   const [loans, setLoans] = useState([]);
   const [search, setSearch] = useState('');
@@ -272,7 +272,7 @@ export default function LoansPage() {
 
         {preview && (
           <div className="calc-box" style={{ display: 'block' }}>
-            <div className="calc-box-title">📊 ประมาณการค่างวด</div>
+            <div className="calc-box-title">ประมาณการค่างวด</div>
             <div className="calc-grid">
               <div className="calc-item"><div className="cv">{formatMoney(preview.pmt)}</div><div className="cl">ค่างวด/เดือน</div></div>
               <div className="calc-item"><div className="cv">{formatMoney(preview.interest)}</div><div className="cl">ดอกเบี้ยรวม</div></div>

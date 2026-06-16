@@ -15,7 +15,7 @@ export default function SetupPage() {
     e.preventDefault();
     try {
       await api('POST', '/api/auth/setup', { firstName, lastName, username, password, email });
-      setMsg({ type: 'success', text: '✅ สร้างบัญชีสำเร็จ กำลังไปหน้าเข้าสู่ระบบ...' });
+      setMsg({ type: 'success', text: 'สร้างบัญชีสำเร็จ กำลังไปหน้าเข้าสู่ระบบ...' });
       setTimeout(() => navigate('/login'), 1500);
     } catch (err) {
       setMsg({ type: 'danger', text: err.message });
@@ -25,7 +25,7 @@ export default function SetupPage() {
   return (
     <div className="login-page">
       <div className="login-card" style={{ maxWidth: 420, width: 420 }}>
-        <div className="login-logo">⚙️ ตั้งค่าระบบครั้งแรก</div>
+        <div className="login-logo">ตั้งค่าระบบครั้งแรก</div>
         <div className="login-subtitle">สร้างบัญชีผู้ดูแลระบบ (Admin)</div>
 
         {msg && <div className={`alert alert-${msg.type}`}>{msg.text}</div>}

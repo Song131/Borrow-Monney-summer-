@@ -11,7 +11,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Legacy *.html bookmarks from the pre-React static pages -> new SPA routes.
 const LEGACY_REDIRECTS = {
   '/login.html': '/login',
   '/customer-login.html': '/customer/login',
@@ -46,9 +45,6 @@ app.use('/api/loans', require('./routes/loans'));
 app.use('/api/payments', require('./routes/payments'));
 app.use('/api/customer', require('./routes/customer'));
 
-// SPA fallback: any other GET request gets the React app shell so client-side
-// routing (React Router) resolves it. Path-less middleware avoids Express 5's
-// path-to-regexp wildcard syntax change entirely.
 app.use((req, res, next) => {
   if (req.method !== 'GET') return next();
   if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) return next();
@@ -57,7 +53,7 @@ app.use((req, res, next) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`\n✅ ระบบกู้ยืมเงินรายย่อยพร้อมใช้งาน`);
-  console.log(`🌐 เปิดเบราว์เซอร์ที่: http://localhost:${PORT}`);
-  console.log(`📌 ครั้งแรกให้ตั้งค่าแอดมินที่: http://localhost:${PORT}/setup\n`);
+  console.log(`\nระบบกู้ยืมเงินรายย่อยพร้อมใช้งาน`);
+  console.log(`เปิดเบราว์เซอร์ที่: http://localhost:${PORT}`);
+  console.log(`ครั้งแรกให้ตั้งค่าแอดมินที่: http://localhost:${PORT}/setup\n`);
 });
